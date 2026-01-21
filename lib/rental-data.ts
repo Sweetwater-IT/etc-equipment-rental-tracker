@@ -144,6 +144,12 @@ export function parseCSV(csv: string): EquipmentData[] {
       endDate: row['rental end date'] || undefined,
     };
 
+    // Set default dates for ON RENT items without dates to make bars visible
+    if (equipment.status === 'ON RENT' && (!equipment.startDate || equipment.startDate === '')) {
+      equipment.startDate = '2025-01-05';
+      equipment.endDate = '2025-01-20';
+    }
+
     data.push(equipment);
   }
 

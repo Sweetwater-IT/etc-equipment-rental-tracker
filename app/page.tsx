@@ -154,7 +154,7 @@ export default function Home() {
         />
         <div className="flex-1 flex flex-col overflow-hidden border-l border-border">
           <TimelineHeader viewType={viewType} startDate={startDate} />
-          <TimelineBody equipment={equipment} viewType={viewType} startDate={startDate} />
+          <TimelineBody equipment={filteredEquipment} viewType={viewType} startDate={startDate} />
         </div>
       </div>
     </div>

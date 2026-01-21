@@ -12,67 +12,97 @@ interface TimelineBodyProps {
 }
 
 export default function TimelineBody({ equipment, viewType, startDate }: TimelineBodyProps) {
-  const CELL_WIDTH = 40;
-
-  // Filter on-rent equipment
-  const onRentEquipment = useMemo(() => {
-    return equipment
-      .filter((eq) => eq.status === 'ON RENT' && eq.startDate && eq.endDate)
-      .sort((a, b) => new Date(b.startDate!).getTime() - new Date(a.startDate!).getTime());
-  }, [equipment]);
-
-  // Get days in current month
-  const daysInMonth = useMemo(() => {
+  const getDaysInView = () => {
+    if (viewType === 'week') return 7;
+    if (viewType === 'year') return 12;
+    // Month view
     const year = startDate.getFullYear();
     const month = startDate.getMonth();
     return new Date(year, month + 1, 0).getDate();
-  }, [startDate]);
+  };
+
+  const getCellWidth = () => {
+    if (viewType === 'week') return 120;
+    if (viewType === 'year') return 120;
+    return 40;
+  };
+
+  const cellWidth = getCellWidth();
+  const daysInView = getDaysInView();
+
+  // All equipment, sorted by code
+  const allEquipment = useMemo(() => {
+    return [...equipment].sort((a, b) => a.code.localeCompare(b.code));
+  }, [equipment]);
 
   // Calculate bar position
   const calculateBar = (startStr: string, endStr: string) => {
     const rentalStart = new Date(startStr);
     const rentalEnd = new Date(endStr);
-    const monthStart = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
 
-    // Days from month start
-    const startOffset = Math.floor((rentalStart.getTime() - monthStart.getTime()) / (86400000));
-    const endOffset = Math.floor((rentalEnd.getTime() - monthStart.getTime()) / (86400000));
-
-    // Clamp to visible month
-    const visibleStart = Math.max(0, startOffset);
-    const visibleEnd = Math.min(daysInMonth - 1, endOffset);
-
-    if (visibleStart > daysInMonth - 1 || visibleEnd < 0) return null;
-
-    const width = (visibleEnd - visibleStart + 1) * CELL_WIDTH;
-    const left = visibleStart * CELL_WIDTH;
-
-    return { left, width };
+    if (viewType === 'year') {
+      const yearStart = startDate.getFullYear();
+      const startMonth = rentalStart.getMonth();
+      const endMonth = rentalEnd.getMonth();
+      const visibleStart = Math.max(0, startMonth);
+      const visibleEnd = Math.min(11, endMonth);
+      if (visibleStart > 11 || visibleEnd < 0) return null;
+      const width = (visibleEnd - visibleStart + 1) * cellWidth;
+      const left = visibleStart * cellWidth;
+      return { left, width };
+    } else {
+      // week/month daily
+      let viewStart: Date;
+      if (viewType === 'week') {
+        viewStart = new Date(startDate);
+      } else {
+        viewStart = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+      }
+      const startOffset = Math.floor((rentalStart.getTime() - viewStart.getTime()) / (86400000));
+      const endOffset = Math.floor((rentalEnd.getTime() - viewStart.getTime()) / (86400000));
+      const visibleStart = Math.max(0, startOffset);
+      const visibleEnd = Math.min(daysInView - 1, endOffset);
+      if (visibleStart > daysInView - 1 || visibleEnd < 0) return null;
+      const width = (visibleEnd - visibleStart + 1) * cellWidth;
+      const left = visibleStart * cellWidth;
+      return { left, width };
+    }
   };
 
   // Render grid cells
   const gridCells = useMemo(() => {
-    return Array.from({ length: daysInMonth }, (_, i) => {
-      const date = new Date(startDate.getFullYear(), startDate.getMonth(), i + 1);
-      const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+    return Array.from({ length: daysInView }, (_, i) => {
+      let date: Date;
+      let isWeekend = false;
+      if (viewType === 'month') {
+        date = new Date(startDate.getFullYear(), startDate.getMonth(), i + 1);
+        isWeekend = date.getDay() === 0 || date.getDay() === 6;
+      } else if (viewType === 'week') {
+        date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+        isWeekend = date.getDay() === 0 || date.getDay() === 6;
+      } else { // year
+        date = new Date(startDate.getFullYear(), i, 1);
+        // no weekend for months
+      }
 
       return (
         <div
           key={i}
           className={`flex-shrink-0 border-r border-border h-full ${isWeekend ? 'bg-muted/30' : ''}`}
-          style={{ width: `${CELL_WIDTH}px` }}
+          style={{ width: `${cellWidth}px` }}
         />
       );
     });
-  }, [daysInMonth, startDate]);
+  }, [daysInView, startDate, viewType, cellWidth]);
 
-  const minRows = Math.max(15, onRentEquipment.length);
+  const minRows = Math.max(15, allEquipment.length);
 
   return (
     <div className="flex-1 overflow-auto">
       {Array.from({ length: minRows }, (_, rowIndex) => {
-        const eq = onRentEquipment[rowIndex];
-        const bar = eq ? calculateBar(eq.startDate!, eq.endDate!) : null;
+        const eq = allEquipment[rowIndex];
+        const bar = eq && eq.status === 'ON RENT' && eq.startDate && eq.endDate ? calculateBar(eq.startDate, eq.endDate) : null;
 
         return (
           <div key={eq?.id || `row-${rowIndex}`} className="relative h-12 border-b border-border hover:bg-muted/20">
