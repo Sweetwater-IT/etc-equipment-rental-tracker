@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import EquipmentList from '@/components/EquipmentList';
