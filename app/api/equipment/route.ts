@@ -43,7 +43,7 @@ function transformToDB(equipment: any) {
 export async function GET() {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
-    .from('equipment')
+    .from('equipments')
     .select('*')
     .order('code');
 
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
   const dbData = transformToDB(equipment);
 
   const { data, error } = await supabase
-    .from('equipment')
+    .from('equipments')
     .insert(dbData)
     .select()
     .single();
@@ -83,7 +83,7 @@ export async function PUT(request: NextRequest) {
   const dbData = transformToDB(equipment);
 
   const { data, error } = await supabase
-    .from('equipment')
+    .from('equipments')
     .update(dbData)
     .eq('id', equipment.id)
     .select()
@@ -106,7 +106,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   const { error } = await supabase
-    .from('equipment')
+    .from('equipments')
     .delete()
     .eq('id', id);
 
