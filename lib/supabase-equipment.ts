@@ -69,7 +69,7 @@ function transformFromDB(row: any): EquipmentData {
     make: row.make,
     model: row.model,
     branch: row.etc_location,
-    status: row.status as 'AVAILABLE' | 'ON RENT',
+    status: row.status as 'AVAILABLE' | 'ON RENT' | 'PENDING' | 'DAMAGED',
     customer: row.customer,
     rentalRate: parseFloat(row.rental_rate) || 0,
     startDate: row.rental_start_date,

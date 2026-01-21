@@ -5,7 +5,7 @@ export interface EquipmentData {
   make: string;
   model: string;
   branch: string;
-  status: 'AVAILABLE' | 'ON RENT';
+  status: 'AVAILABLE' | 'ON RENT' | 'PENDING' | 'DAMAGED';
   customer?: string;
   rentalRate: number;
   startDate?: string;
