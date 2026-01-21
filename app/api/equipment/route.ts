@@ -1,5 +1,11 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { NextRequest } from 'next/server';
+
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  return createClient(supabaseUrl, supabaseAnonKey);
+}
 
 // Transform functions
 function transformFromDB(row: any) {
@@ -35,6 +41,7 @@ function transformToDB(equipment: any) {
 }
 
 export async function GET() {
+  const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from('equipment')
     .select('*')
@@ -48,6 +55,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const supabase = getSupabaseClient();
   const equipment = await request.json();
   const dbData = transformToDB(equipment);
 
@@ -65,6 +73,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const supabase = getSupabaseClient();
   const equipment = await request.json();
   const dbData = transformToDB(equipment);
 
@@ -83,6 +92,7 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const supabase = getSupabaseClient();
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
 
