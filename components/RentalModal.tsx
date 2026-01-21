@@ -81,7 +81,7 @@ export default function RentalModal({ open, equipment, onOpenChange, onSave }: R
         ...equipment,
         startDate: format(rentalStartDate, 'yyyy-MM-dd'),
         endDate: format(rentalEndDate, 'yyyy-MM-dd'),
-        status: 'ON RENT',
+        status: 'ON RENT' as const,
       };
       onSave(updatedEquipment);
       onOpenChange(false);

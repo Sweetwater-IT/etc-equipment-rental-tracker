@@ -35,16 +35,16 @@ export default function EquipmentList({
       setModalOpen(true);
     } else {
       // Closing rental
-      const { status, ...rest } = eq;
-      onEquipmentUpdate({
-        ...rest,
+      const updatedEquipment: EquipmentData = {
+        ...eq,
         status: 'AVAILABLE',
-      } as EquipmentData);
+      };
+      onEquipmentUpdate(updatedEquipment);
     }
   };
 
   const handleModalSave = (updatedEquipment: EquipmentData) => {
-    const finalEquipment = {
+    const finalEquipment: EquipmentData = {
       ...updatedEquipment,
       status: 'ON RENT',
     };
