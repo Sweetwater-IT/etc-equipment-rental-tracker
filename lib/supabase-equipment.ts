@@ -2,12 +2,21 @@ import { EquipmentData } from '@/types/equipment';
 
 // Fetch all equipment
 export async function fetchEquipment(): Promise<EquipmentData[]> {
-  const res = await fetch('/api/equipment');
-  if (!res.ok) {
-    console.error('Error fetching equipment');
+  try {
+    const res = await fetch('/api/equipment');
+    if (!res.ok) {
+      console.error('Fetch failed:', res.status, res.statusText);
+      const errorText = await res.text();
+      console.error('Error response:', errorText);
+      return [];
+    }
+    const data = await res.json();
+    console.log('Fetched equipment:', data.length, 'items');
+    return data;
+  } catch (error) {
+    console.error('Network error fetching equipment:', error);
     return [];
   }
-  return res.json();
 }
 
 // Create equipment
