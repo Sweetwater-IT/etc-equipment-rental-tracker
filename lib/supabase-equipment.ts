@@ -1,63 +1,22 @@
-import { supabase } from './supabase';
+// import { supabase } from './supabase';
 import { EquipmentData } from '@/types/equipment';
 
 // Fetch all equipment
 export async function fetchEquipment(): Promise<EquipmentData[]> {
-  const { data, error } = await supabase
-    .from('equipment')
-    .select('*')
-    .order('id');
-
-  if (error) {
-    console.error('Error fetching equipment:', error);
-    return [];
-  }
-
-  return data.map(transformFromDB);
+  // Temporarily return empty array - using hardcoded data instead
+  return [];
 }
 
 // Update equipment
 export async function updateEquipment(equipment: EquipmentData): Promise<EquipmentData | null> {
-  const dbData = transformToDB(equipment);
-
-  const { data, error } = await supabase
-    .from('equipment')
-    .update(dbData)
-    .eq('id', equipment.id)
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error updating equipment:', error);
-    return null;
-  }
-
-  return transformFromDB(data);
+  // Temporarily return the equipment unchanged
+  return equipment;
 }
 
 // Subscribe to equipment changes
 export function subscribeToEquipment(callback: (equipment: EquipmentData[]) => void) {
-  const channel = supabase
-    .channel('equipment_changes')
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'equipment'
-      },
-      async (payload) => {
-        console.log('Equipment change:', payload);
-        // Refetch all equipment on any change
-        const equipment = await fetchEquipment();
-        callback(equipment);
-      }
-    )
-    .subscribe();
-
-  return () => {
-    supabase.removeChannel(channel);
-  };
+  // Temporarily return a no-op unsubscribe function
+  return () => {};
 }
 
 // Transform database row to EquipmentData

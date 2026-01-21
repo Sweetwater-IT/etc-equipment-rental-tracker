@@ -1,15 +1,12 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-
-// Force dynamic rendering to prevent static generation issues
-export const dynamic = 'force-dynamic';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import EquipmentList from '@/components/EquipmentList';
 import TimelineHeader from '@/components/TimelineHeader';
 import TimelineBody from '@/components/TimelineBody';
-import { fetchEquipment, updateEquipment, subscribeToEquipment } from '@/lib/supabase-equipment';
+import { rentalData } from '@/lib/rental-data';
 import { EquipmentData } from '@/types/equipment';
 import { Calendar } from 'lucide-react';
 
@@ -21,27 +18,7 @@ export default function Home() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [branchFilter, setBranchFilter] = useState<string>('all');
   const [startDate, setStartDate] = useState(new Date(2025, 0, 1)); // January 2025
-  const [equipment, setEquipment] = useState<EquipmentData[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch equipment on mount
-  useEffect(() => {
-    const loadEquipment = async () => {
-      setLoading(true);
-      const data = await fetchEquipment();
-      setEquipment(data);
-      setLoading(false);
-    };
-
-    loadEquipment();
-
-    // Set up real-time subscription
-    const unsubscribe = subscribeToEquipment((updatedEquipment) => {
-      setEquipment(updatedEquipment);
-    });
-
-    return unsubscribe;
-  }, []);
+  const [equipment, setEquipment] = useState<EquipmentData[]>(rentalData);
 
   const filteredEquipment = useMemo(() => {
     return equipment.filter((eq) => {
@@ -59,19 +36,10 @@ export default function Home() {
   const equipmentTypes = ['all', ...Array.from(new Set(equipment.map((eq) => eq.type)))];
   const branches = ['all', ...Array.from(new Set(equipment.map((eq) => eq.branch)))];
 
-  const handleEquipmentUpdate = async (updatedEquipment: EquipmentData) => {
-    // Optimistically update UI
+  const handleEquipmentUpdate = (updatedEquipment: EquipmentData) => {
     setEquipment((prev) =>
       prev.map((eq) => (eq.id === updatedEquipment.id ? updatedEquipment : eq))
     );
-
-    // Update database
-    const result = await updateEquipment(updatedEquipment);
-    if (!result) {
-      // Revert on error
-      console.error('Failed to update equipment');
-      // Could add toast notification here
-    }
   };
 
   const handlePrevious = () => {
@@ -177,27 +145,18 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      {loading ? (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-            <p className="text-sm text-muted-foreground">Loading equipment...</p>
-          </div>
+      <div className="flex flex-1 overflow-hidden">
+        <EquipmentList
+          equipment={filteredEquipment}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          onEquipmentUpdate={handleEquipmentUpdate}
+        />
+        <div className="flex-1 flex flex-col overflow-hidden border-l border-border">
+          <TimelineHeader viewType={viewType} startDate={startDate} />
+          <TimelineBody equipment={equipment} viewType={viewType} startDate={startDate} />
         </div>
-      ) : (
-        <div className="flex flex-1 overflow-hidden">
-          <EquipmentList
-            equipment={filteredEquipment}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            onEquipmentUpdate={handleEquipmentUpdate}
-          />
-          <div className="flex-1 flex flex-col overflow-hidden border-l border-border">
-            <TimelineHeader viewType={viewType} startDate={startDate} />
-            <TimelineBody equipment={equipment} viewType={viewType} startDate={startDate} />
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
