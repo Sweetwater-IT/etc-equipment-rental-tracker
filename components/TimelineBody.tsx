@@ -109,18 +109,18 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
             {/* Grid background */}
             <div className="absolute inset-0 flex">{gridCells}</div>
 
-            {/* Red rental bar */}
+            {/* Rental bar */}
             {eq && bar && (
               <div
-                className="absolute top-2 h-8 bg-red-500 border-2 border-red-700 rounded-md shadow-lg flex items-center px-3 z-20"
+                className="absolute top-2 h-8 bg-red-100 border-2 border-red-800 rounded-md shadow-lg flex items-center px-3 z-20"
                 style={{ left: `${bar.left}px`, width: `${bar.width}px` }}
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-white truncate">
+                  <p className="text-xs font-bold text-foreground truncate">
                     {eq.code} - {eq.customer || 'No Customer'}
                   </p>
                   {eq.rentalRate > 0 && (
-                    <p className="text-[10px] text-white/90">${eq.rentalRate}/mo</p>
+                    <p className="text-[10px] text-black">${eq.rentalRate}/mo</p>
                   )}
                 </div>
               </div>
