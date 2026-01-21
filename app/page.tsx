@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import EquipmentList from '@/components/EquipmentList';
 import TimelineHeader from '@/components/TimelineHeader';
 import TimelineBody from '@/components/TimelineBody';
-import { rentalData } from '@/lib/rental-data';
+import { fetchEquipment, subscribeToEquipment, updateEquipment } from '@/lib/supabase-equipment';
 import { EquipmentData } from '@/types/equipment';
 import { Calendar } from 'lucide-react';
 
@@ -18,7 +18,13 @@ export default function Home() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [branchFilter, setBranchFilter] = useState<string>('all');
   const [startDate, setStartDate] = useState(new Date(2025, 0, 1)); // January 2025
-  const [equipment, setEquipment] = useState<EquipmentData[]>(rentalData);
+  const [equipment, setEquipment] = useState<EquipmentData[]>([]);
+
+  useEffect(() => {
+    fetchEquipment().then(setEquipment);
+    const unsubscribe = subscribeToEquipment(setEquipment);
+    return unsubscribe;
+  }, []);
 
   const filteredEquipment = useMemo(() => {
     return equipment.filter((eq) => {
@@ -36,10 +42,11 @@ export default function Home() {
   const equipmentTypes = ['all', ...Array.from(new Set(equipment.map((eq) => eq.type)))];
   const branches = ['all', ...Array.from(new Set(equipment.map((eq) => eq.branch)))];
 
-  const handleEquipmentUpdate = (updatedEquipment: EquipmentData) => {
-    setEquipment((prev) =>
-      prev.map((eq) => (eq.id === updatedEquipment.id ? updatedEquipment : eq))
-    );
+  const handleEquipmentUpdate = async (updatedEquipment: EquipmentData) => {
+    const result = await updateEquipment(updatedEquipment);
+    if (result) {
+      setEquipment((prev) => prev.map((eq) => (eq.id === result.id ? result : eq)));
+    }
   };
 
   const handlePrevious = () => {
