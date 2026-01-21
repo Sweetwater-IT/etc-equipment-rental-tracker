@@ -47,11 +47,16 @@ export async function GET() {
     .select('*')
     .order('code');
 
+  console.log('API GET: data length', data?.length, 'error', error);
+
   if (error) {
+    console.error('Supabase error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 
-  return Response.json(data.map(transformFromDB));
+  const transformed = data.map(transformFromDB);
+  console.log('API GET: transformed length', transformed.length);
+  return Response.json(transformed);
 }
 
 export async function POST(request: NextRequest) {
