@@ -1,53 +1,41 @@
-import { supabase } from './supabase';
 import { EquipmentData } from '@/types/equipment';
 
 // Fetch all equipment
 export async function fetchEquipment(): Promise<EquipmentData[]> {
-  const { data, error } = await supabase
-    .from('equipment')
-    .select('*')
-    .order('code');
-
-  if (error) {
-    console.error('Error fetching equipment:', error);
+  const res = await fetch('/api/equipment');
+  if (!res.ok) {
+    console.error('Error fetching equipment');
     return [];
   }
+  return res.json();
+}
 
-  return data.map(transformFromDB);
+// Create equipment
+export async function createEquipment(equipment: Omit<EquipmentData, 'id'>): Promise<EquipmentData | null> {
+  const res = await fetch('/api/equipment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(equipment),
+  });
+  if (!res.ok) return null;
+  return res.json();
 }
 
 // Update equipment
 export async function updateEquipment(equipment: EquipmentData): Promise<EquipmentData | null> {
-  const dbData = transformToDB(equipment);
-
-  const { data, error } = await supabase
-    .from('equipment')
-    .update(dbData)
-    .eq('id', equipment.id)
-    .select()
-    .single();
-
-  if (error) {
-    console.error('Error updating equipment:', error);
-    return null;
-  }
-
-  return transformFromDB(data);
+  const res = await fetch('/api/equipment', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(equipment),
+  });
+  if (!res.ok) return null;
+  return res.json();
 }
 
-// Subscribe to equipment changes
-export function subscribeToEquipment(callback: (equipment: EquipmentData[]) => void) {
-  const channel = supabase
-    .channel('equipment_changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'equipment' }, async () => {
-      const equipment = await fetchEquipment();
-      callback(equipment);
-    })
-    .subscribe();
-
-  return () => {
-    supabase.removeChannel(channel);
-  };
+// Delete equipment
+export async function deleteEquipment(id: string): Promise<boolean> {
+  const res = await fetch(`/api/equipment?id=${id}`, { method: 'DELETE' });
+  return res.ok;
 }
 
 // Transform database row to EquipmentData

@@ -6,11 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import EquipmentList from '@/components/EquipmentList';
 import TimelineHeader from '@/components/TimelineHeader';
 import TimelineBody from '@/components/TimelineBody';
-import { fetchEquipment, subscribeToEquipment, updateEquipment } from '@/lib/supabase-equipment';
+import { fetchEquipment, updateEquipment } from '@/lib/supabase-equipment';
 import { EquipmentData } from '@/types/equipment';
 import { Calendar } from 'lucide-react';
 
 type ViewType = 'week' | 'month' | 'year';
+
+export const dynamic = 'force-dynamic';
 
 export default function Home() {
   const [viewType, setViewType] = useState<ViewType>('month');
@@ -22,8 +24,6 @@ export default function Home() {
 
   useEffect(() => {
     fetchEquipment().then(setEquipment);
-    const unsubscribe = subscribeToEquipment(setEquipment);
-    return unsubscribe;
   }, []);
 
   const filteredEquipment = useMemo(() => {
