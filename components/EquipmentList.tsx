@@ -97,7 +97,7 @@ export default function EquipmentList({
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex-1 min-w-0">
                       {/* Category Badge */}
-                      <p className="text-xs font-bold text-primary uppercase tracking-wide mb-1">
+                      <p className="text-sm font-bold text-primary uppercase tracking-wide mb-1">
                         {eq.type}
                       </p>
                       {/* Equipment Code */}
@@ -106,7 +106,7 @@ export default function EquipmentList({
                       <p className="text-xs text-muted-foreground truncate">
                         {eq.make} {eq.model}
                       </p>
-                      <p className="text-xs text-muted-foreground">{eq.branch}</p>
+                      <p className="text-sm text-muted-foreground font-medium">{eq.branch}</p>
                     </div>
                   </div>
 
