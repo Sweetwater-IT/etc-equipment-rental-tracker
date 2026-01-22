@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -45,6 +45,17 @@ export default function RentalModal({ open, equipment, onOpenChange, onSave }: R
   const [customer, setCustomer] = useState(equipment?.customer || '');
   const [rentalAmount, setRentalAmount] = useState('');
   const [rentalFrequency, setRentalFrequency] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
+
+  // Reset form when equipment changes
+  useEffect(() => {
+    setRentalStartDate(equipment?.startDate ? new Date(equipment.startDate) : undefined);
+    setRentalEndDate(equipment?.endDate ? new Date(equipment.endDate) : undefined);
+    setBillingStartDate(undefined);
+    setBillingEndDate(undefined);
+    setCustomer(equipment?.customer || '');
+    setRentalAmount('');
+    setRentalFrequency('monthly');
+  }, [equipment]);
 
   const handleDateSelect = (date: Date | undefined, dateType: DateType) => {
     if (dateType === 'rentalStart') setRentalStartDate(date);
