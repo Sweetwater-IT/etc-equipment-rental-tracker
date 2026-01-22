@@ -20,9 +20,11 @@ export default function TimelineHeader({ viewType, startDate }: TimelineHeaderPr
   };
 
   const getCellWidth = () => {
+    const timelineWidth = 1200;
     if (viewType === 'week') return 120;
     if (viewType === 'year') return 120;
-    return 40;
+    const days = getDaysInView();
+    return timelineWidth / days;
   };
 
   const generateHeaders = () => {
@@ -98,7 +100,7 @@ export default function TimelineHeader({ viewType, startDate }: TimelineHeaderPr
   };
 
   return (
-    <div className="border-b border-border bg-muted/50 overflow-x-auto">
+    <div className="border-b border-border bg-muted/50 overflow-x-auto sticky top-0 z-10">
       <div className="flex">{generateHeaders()}</div>
     </div>
   );

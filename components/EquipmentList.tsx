@@ -57,6 +57,11 @@ export default function EquipmentList({
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const paginatedEquipment = equipment.slice(startIndex, endIndex);
 
+  // All equipment, sorted by code for timeline indexing
+  const allEquipment = useMemo(() => {
+    return [...equipment].sort((a, b) => a.code.localeCompare(b.code));
+  }, [equipment]);
+
   // Reset to page 1 when equipment changes (e.g., via search/filter)
   const prevEquipmentLength = equipment.length;
   useMemo(() => {
@@ -64,6 +69,15 @@ export default function EquipmentList({
       setCurrentPage(1);
     }
   }, [equipment.length, currentPage, totalPages]);
+
+  const handleEquipmentClick = (eq: EquipmentData) => {
+    if (eq.status === 'ON RENT') {
+      const index = allEquipment.findIndex(e => e.id === eq.id);
+      if (index !== -1) {
+        document.getElementById(`timeline-row-${index}`)?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   return (
     <>
@@ -92,7 +106,8 @@ export default function EquipmentList({
               return (
                 <div
                   key={eq.id}
-                  className="px-3 py-3 border-b border-border hover:bg-muted/50 transition-colors"
+                  className="px-3 py-3 border-b border-border hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => handleEquipmentClick(eq)}
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex-1 min-w-0">

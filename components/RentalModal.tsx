@@ -11,6 +11,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
@@ -41,6 +43,8 @@ export default function RentalModal({ open, equipment, onOpenChange, onSave }: R
   const [billingStartDate, setBillingStartDate] = useState<Date | undefined>();
   const [billingEndDate, setBillingEndDate] = useState<Date | undefined>();
   const [customer, setCustomer] = useState(equipment?.customer || '');
+  const [rentalAmount, setRentalAmount] = useState('');
+  const [rentalFrequency, setRentalFrequency] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
 
   const handleDateSelect = (date: Date | undefined, dateType: DateType) => {
     if (dateType === 'rentalStart') setRentalStartDate(date);
@@ -206,6 +210,40 @@ export default function RentalModal({ open, equipment, onOpenChange, onSave }: R
             </div>
           </div>
 
+          {/* Rental Price Section */}
+          <div className="space-y-3 border-t border-border pt-4">
+            <h3 className="text-sm font-semibold text-foreground">Rental Price</h3>
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Amount */}
+              <div className="space-y-2">
+                <Label className="text-xs font-medium">Amount</Label>
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  value={rentalAmount}
+                  onChange={(e) => setRentalAmount(e.target.value)}
+                  className="h-9"
+                />
+              </div>
+
+              {/* Frequency */}
+              <div className="space-y-2">
+                <Label className="text-xs font-medium">Frequency</Label>
+                <Select value={rentalFrequency} onValueChange={(value: 'daily' | 'weekly' | 'monthly') => setRentalFrequency(value)}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
           {/* Billing Dates Section */}
           <div className="space-y-3 border-t border-border pt-4">
             <h3 className="text-sm font-semibold text-foreground">Billing Period</h3>
@@ -265,6 +303,22 @@ export default function RentalModal({ open, equipment, onOpenChange, onSave }: R
                   </PopoverContent>
                 </Popover>
               </div>
+            </div>
+
+            {/* Same as Rental Period Button */}
+            <div className="pt-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setBillingStartDate(rentalStartDate);
+                  setBillingEndDate(rentalEndDate);
+                }}
+                disabled={!rentalStartDate || !rentalEndDate}
+                className="h-7 text-xs"
+              >
+                Same as Rental Period
+              </Button>
             </div>
 
             {/* Quick Duration Presets for Billing */}

@@ -22,9 +22,11 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
   };
 
   const getCellWidth = () => {
+    const timelineWidth = 1200;
     if (viewType === 'week') return 120;
     if (viewType === 'year') return 120;
-    return 40;
+    const days = getDaysInView();
+    return timelineWidth / days;
   };
 
   const cellWidth = getCellWidth();
@@ -105,7 +107,7 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
         const bar = eq && eq.status === 'ON RENT' && (eq as any).rental_start_date && (eq as any).rental_end_date ? calculateBar((eq as any).rental_start_date, (eq as any).rental_end_date) : null;
 
         return (
-          <div key={eq?.id || `row-${rowIndex}`} className="relative h-12 border-b border-border hover:bg-muted/20">
+          <div id={`timeline-row-${rowIndex}`} key={eq?.id || `row-${rowIndex}`} className="relative h-12 border-b border-border hover:bg-muted/20">
             {/* Grid background */}
             <div className="absolute inset-0 flex">{gridCells}</div>
 
