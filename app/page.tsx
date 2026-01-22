@@ -157,7 +157,7 @@ export default function Home() {
           onSearchChange={setSearchTerm}
           onEquipmentUpdate={handleEquipmentUpdate}
         />
-        <div className="flex-1 flex flex-col overflow-hidden border-l border-border">
+        <div className="flex-1 flex flex-col overflow-x-auto border-l border-border">
           <TimelineHeader viewType={viewType} startDate={startDate} />
           <TimelineBody equipment={filteredEquipment} viewType={viewType} startDate={startDate} />
         </div>

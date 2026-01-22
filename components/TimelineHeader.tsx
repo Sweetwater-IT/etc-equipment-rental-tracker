@@ -75,7 +75,7 @@ export default function TimelineHeader({ viewType, startDate }: TimelineHeaderPr
   };
 
   return (
-    <div className="border-b border-border bg-muted/50 fixed top-0 z-10" style={{ left: '320px', width: '1200px' }}>
+    <div className="border-b border-border bg-muted/50">
       <div className="flex">{generateHeaders()}</div>
     </div>
   );

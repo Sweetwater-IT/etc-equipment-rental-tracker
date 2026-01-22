@@ -90,7 +90,7 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
   const minRows = Math.max(15, allEquipment.length);
 
   return (
-    <div className="flex-1 overflow-auto" style={{ marginTop: '40px' }}>
+    <div className="flex-1">
       {Array.from({ length: minRows }, (_, rowIndex) => {
         const eq = allEquipment[rowIndex];
         const bar = eq && eq.status === 'ON RENT' && (eq as any).rental_start_date && (eq as any).rental_end_date ? calculateBar((eq as any).rental_start_date, (eq as any).rental_end_date) : null;
