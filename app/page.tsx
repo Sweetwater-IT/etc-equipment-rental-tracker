@@ -55,6 +55,7 @@ export default function Home() {
       newDate.setDate(newDate.getDate() - 7);
     } else if (viewType === 'month') {
       newDate.setMonth(newDate.getMonth() - 1);
+      newDate.setDate(1);
     } else {
       newDate.setFullYear(newDate.getFullYear() - 1);
     }
@@ -67,6 +68,7 @@ export default function Home() {
       newDate.setDate(newDate.getDate() + 7);
     } else if (viewType === 'month') {
       newDate.setMonth(newDate.getMonth() + 1);
+      newDate.setDate(1);
     } else {
       newDate.setFullYear(newDate.getFullYear() + 1);
     }
