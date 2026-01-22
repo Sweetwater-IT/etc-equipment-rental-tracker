@@ -38,6 +38,10 @@ export default function EquipmentList({
       const updatedEquipment: EquipmentData = {
         ...eq,
         status: 'AVAILABLE',
+        startDate: '',
+        endDate: '',
+        customer: '',
+        rentalRate: 0,
       };
       onEquipmentUpdate(updatedEquipment);
     }
