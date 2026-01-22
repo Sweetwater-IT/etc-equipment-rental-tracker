@@ -1,7 +1,8 @@
 'use client';
 
-import { EquipmentData } from '@/types/equipment';
-import { useMemo } from 'react';
+import { EquipmentData, RentalEntry } from '@/types/equipment';
+import { useMemo, useState, useEffect } from 'react';
+import { fetchRentals } from '@/lib/supabase-equipment';
 
 type ViewType = 'month' | 'year';
 
@@ -12,6 +13,12 @@ interface TimelineBodyProps {
 }
 
 export default function TimelineBody({ equipment, viewType, startDate }: TimelineBodyProps) {
+  const [rentals, setRentals] = useState<RentalEntry[]>([]);
+
+  useEffect(() => {
+    fetchRentals().then(setRentals);
+  }, []);
+
   const getDaysInView = () => {
     if (viewType === 'year') return 12;
     // Month view
@@ -93,22 +100,27 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
     <div className="flex-1">
       {Array.from({ length: minRows }, (_, rowIndex) => {
         const eq = allEquipment[rowIndex];
-        const bar = eq && eq.startDate && eq.endDate ? calculateBar(eq.startDate, eq.endDate) : null;
+        const eqRentals = eq ? rentals.filter(r => r.equipment_id === eq.id) : [];
 
         return (
           <div id={`timeline-row-${rowIndex}`} key={eq?.id || `row-${rowIndex}`} className="relative h-12 border-b border-border hover:bg-muted/20">
             {/* Grid background */}
             <div className="absolute inset-0 flex" style={{ minWidth: `${daysInView * cellWidth}px` }}>{gridCells}</div>
 
-            {/* Rental bar */}
-            {eq && bar && (
-              <div
-                className="absolute top-2 h-5 bg-blue-50 border border-blue-200 rounded flex items-center px-2 text-[10px] font-medium text-blue-700 hover:brightness-95 transition-all cursor-pointer z-10"
-                style={{ left: `${bar.left}px`, width: `${bar.width}px` }}
-              >
-                <span className="truncate">{eq.code}</span>
-              </div>
-            )}
+            {/* Rental bars */}
+            {eqRentals.map((rental) => {
+              const bar = calculateBar(rental.start_date, rental.end_date);
+              if (!bar) return null;
+              return (
+                <div
+                  key={rental.id}
+                  className="absolute top-2 h-5 bg-blue-50 border border-blue-200 rounded flex items-center px-2 text-[10px] font-medium text-blue-700 hover:brightness-95 transition-all cursor-pointer z-10"
+                  style={{ left: `${bar.left}px`, width: `${bar.width}px` }}
+                >
+                  <span className="truncate">{rental.equipment_code}</span>
+                </div>
+              );
+            })}
           </div>
         );
       })}

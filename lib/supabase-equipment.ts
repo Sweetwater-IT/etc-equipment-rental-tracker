@@ -1,4 +1,4 @@
-import { EquipmentData } from '@/types/equipment';
+import { EquipmentData, RentalEntry } from '@/types/equipment';
 
 // Fetch all equipment
 export async function fetchEquipment(): Promise<EquipmentData[]> {
@@ -45,6 +45,23 @@ export async function updateEquipment(equipment: EquipmentData): Promise<Equipme
 export async function deleteEquipment(id: string): Promise<boolean> {
   const res = await fetch(`/api/equipment?id=${id}`, { method: 'DELETE' });
   return res.ok;
+}
+
+// Fetch all rentals
+export async function fetchRentals(): Promise<RentalEntry[]> {
+  try {
+    const res = await fetch('/api/rentals');
+    if (!res.ok) {
+      console.error('Fetch rentals failed:', res.status, res.statusText);
+      return [];
+    }
+    const data = await res.json();
+    console.log('Fetched rentals:', data.length, 'items');
+    return data;
+  } catch (error) {
+    console.error('Network error fetching rentals:', error);
+    return [];
+  }
 }
 
 // Transform database row to EquipmentData
