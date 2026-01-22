@@ -54,9 +54,8 @@ export async function GET() {
     return Response.json({ error: error.message }, { status: 500 });
   }
 
-  const transformed = data.map(transformFromDB);
-  console.log('API GET: transformed length', transformed.length);
-  return Response.json(transformed);
+  console.log('API GET: raw data sample', data[0]);
+  return Response.json(data);
 }
 
 export async function POST(request: NextRequest) {
