@@ -98,7 +98,7 @@ export default function EquipmentList({
                     <div className="flex-1 min-w-0">
                       {/* Category Badge */}
                       <p className="text-sm font-bold text-primary uppercase tracking-wide mb-1">
-                        {eq.type}
+                        {(eq as any).category}
                       </p>
                       {/* Equipment Code */}
                       <p className="text-sm font-semibold text-foreground truncate">{eq.code}</p>
@@ -106,7 +106,7 @@ export default function EquipmentList({
                       <p className="text-xs text-muted-foreground truncate">
                         {eq.make} {eq.model}
                       </p>
-                      <p className="text-sm text-muted-foreground font-medium">{eq.branch}</p>
+                      <p className="text-sm text-muted-foreground font-medium">{(eq as any).etc_location}</p>
                     </div>
                   </div>
 
