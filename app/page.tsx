@@ -6,8 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import EquipmentList from '@/components/EquipmentList';
 import TimelineHeader from '@/components/TimelineHeader';
 import TimelineBody from '@/components/TimelineBody';
-import { fetchEquipment, updateEquipment } from '@/lib/supabase-equipment';
-import { EquipmentData } from '@/types/equipment';
+import { fetchEquipment, updateEquipment, fetchRentals } from '@/lib/supabase-equipment';
+import { EquipmentData, RentalEntry } from '@/types/equipment';
 import { Calendar } from 'lucide-react';
 
 type ViewType = 'month' | 'year';
@@ -21,9 +21,11 @@ export default function Home() {
   const [branchFilter, setBranchFilter] = useState<string>('all');
   const [startDate, setStartDate] = useState(new Date(2025, 0, 1)); // January 2025
   const [equipment, setEquipment] = useState<EquipmentData[]>([]);
+  const [rentals, setRentals] = useState<RentalEntry[]>([]);
 
   useEffect(() => {
     fetchEquipment().then(setEquipment);
+    fetchRentals().then(setRentals);
   }, []);
 
   const filteredEquipment = useMemo(() => {
@@ -153,6 +155,7 @@ export default function Home() {
       <div className="flex flex-1 overflow-hidden">
         <EquipmentList
           equipment={filteredEquipment}
+          rentals={rentals}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           onEquipmentUpdate={handleEquipmentUpdate}

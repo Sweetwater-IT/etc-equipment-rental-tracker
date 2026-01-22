@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { EquipmentData } from '@/types/equipment';
+import { EquipmentData, RentalEntry } from '@/types/equipment';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface EquipmentListProps {
   equipment: EquipmentData[];
+  rentals: RentalEntry[];
   searchTerm: string;
   onSearchChange: (term: string) => void;
   onEquipmentUpdate: (equipment: EquipmentData) => void;
@@ -20,6 +21,7 @@ const ITEMS_PER_PAGE = 25;
 
 export default function EquipmentList({
   equipment,
+  rentals,
   searchTerm,
   onSearchChange,
   onEquipmentUpdate,
@@ -27,12 +29,17 @@ export default function EquipmentList({
   const [selectedEquipment, setSelectedEquipment] = useState<EquipmentData | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pressedSwitch, setPressedSwitch] = useState<number | null>(null);
 
   const handleSwitchChange = (eq: EquipmentData, checked: boolean) => {
     if (checked) {
-      // Opening rental - show modal
+      // Opening rental - animate switch then show modal
+      setPressedSwitch(eq.id);
       setSelectedEquipment(eq);
-      setModalOpen(true);
+      setTimeout(() => {
+        setModalOpen(true);
+        setPressedSwitch(null);
+      }, 200);
     } else {
       // Closing rental
       const updatedEquipment: EquipmentData = {
@@ -106,7 +113,7 @@ export default function EquipmentList({
             </div>
           ) : (
             paginatedEquipment.map((eq) => {
-              const isOnRent = eq.status === 'ON RENT';
+              const isOnRent = rentals.some(r => r.equipment_id === eq.id);
               return (
                 <div
                   key={eq.id}
@@ -131,11 +138,17 @@ export default function EquipmentList({
 
                   {/* On Rent Switch */}
                   <div className="flex items-center gap-2 bg-muted/40 rounded px-2 py-2 mb-2">
-                    <Switch
-                      id={`switch-${eq.id}`}
-                      checked={isOnRent}
-                      onCheckedChange={(checked) => handleSwitchChange(eq, checked)}
-                    />
+                    <div
+                      className={`transition-all duration-150 ease-out ${
+                        pressedSwitch === eq.id ? 'scale-95 shadow-sm' : 'scale-100'
+                      }`}
+                    >
+                      <Switch
+                        id={`switch-${eq.id}`}
+                        checked={isOnRent}
+                        onCheckedChange={(checked) => handleSwitchChange(eq, checked)}
+                      />
+                    </div>
                     <Label
                       htmlFor={`switch-${eq.id}`}
                       className="text-xs font-semibold cursor-pointer text-foreground flex-1"
