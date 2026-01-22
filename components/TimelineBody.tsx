@@ -3,7 +3,7 @@
 import { EquipmentData } from '@/types/equipment';
 import { useMemo } from 'react';
 
-type ViewType = 'week' | 'month' | 'year';
+type ViewType = 'month' | 'year';
 
 interface TimelineBodyProps {
   equipment: EquipmentData[];
@@ -13,7 +13,6 @@ interface TimelineBodyProps {
 
 export default function TimelineBody({ equipment, viewType, startDate }: TimelineBodyProps) {
   const getDaysInView = () => {
-    if (viewType === 'week') return 7;
     if (viewType === 'year') return 12;
     // Month view
     const year = startDate.getFullYear();
@@ -23,7 +22,6 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
 
   const getCellWidth = () => {
     const timelineWidth = 1200;
-    if (viewType === 'week') return 120;
     if (viewType === 'year') return 120;
     const days = getDaysInView();
     return timelineWidth / days;
@@ -53,13 +51,8 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
       const left = visibleStart * cellWidth;
       return { left, width };
     } else {
-      // week/month daily
-      let viewStart: Date;
-      if (viewType === 'week') {
-        viewStart = new Date(startDate);
-      } else {
-        viewStart = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-      }
+      // month daily
+      const viewStart = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
       const startOffset = Math.floor((rentalStart.getTime() - viewStart.getTime()) / (86400000));
       const endOffset = Math.floor((rentalEnd.getTime() - viewStart.getTime()) / (86400000));
       const visibleStart = Math.max(0, startOffset);
@@ -79,10 +72,6 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
       if (viewType === 'month') {
         date = new Date(startDate.getFullYear(), startDate.getMonth(), i + 1);
         isWeekend = date.getDay() === 0 || date.getDay() === 6;
-      } else if (viewType === 'week') {
-        date = new Date(startDate);
-        date.setDate(startDate.getDate() + i);
-        isWeekend = date.getDay() === 0 || date.getDay() === 6;
       } else { // year
         date = new Date(startDate.getFullYear(), i, 1);
         // no weekend for months
@@ -101,7 +90,7 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
   const minRows = Math.max(15, allEquipment.length);
 
   return (
-    <div className="flex-1 overflow-auto">
+    <div className="flex-1 overflow-auto" style={{ marginTop: '40px' }}>
       {Array.from({ length: minRows }, (_, rowIndex) => {
         const eq = allEquipment[rowIndex];
         const bar = eq && eq.status === 'ON RENT' && (eq as any).rental_start_date && (eq as any).rental_end_date ? calculateBar((eq as any).rental_start_date, (eq as any).rental_end_date) : null;

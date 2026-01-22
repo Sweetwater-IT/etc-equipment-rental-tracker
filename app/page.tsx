@@ -10,7 +10,7 @@ import { fetchEquipment, updateEquipment } from '@/lib/supabase-equipment';
 import { EquipmentData } from '@/types/equipment';
 import { Calendar } from 'lucide-react';
 
-type ViewType = 'week' | 'month' | 'year';
+type ViewType = 'month' | 'year';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,9 +51,7 @@ export default function Home() {
 
   const handlePrevious = () => {
     const newDate = new Date(startDate);
-    if (viewType === 'week') {
-      newDate.setDate(newDate.getDate() - 7);
-    } else if (viewType === 'month') {
+    if (viewType === 'month') {
       newDate.setMonth(newDate.getMonth() - 1);
       newDate.setDate(1);
     } else {
@@ -64,9 +62,7 @@ export default function Home() {
 
   const handleNext = () => {
     const newDate = new Date(startDate);
-    if (viewType === 'week') {
-      newDate.setDate(newDate.getDate() + 7);
-    } else if (viewType === 'month') {
+    if (viewType === 'month') {
       newDate.setMonth(newDate.getMonth() + 1);
       newDate.setDate(1);
     } else {
@@ -122,7 +118,7 @@ export default function Home() {
           {/* View Controls */}
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex gap-1.5">
-              {(['week', 'month', 'year'] as ViewType[]).map((view) => (
+              {(['month', 'year'] as ViewType[]).map((view) => (
                 <Button
                   key={view}
                   variant={viewType === view ? 'default' : 'outline'}
