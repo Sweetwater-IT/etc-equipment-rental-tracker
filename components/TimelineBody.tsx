@@ -103,17 +103,10 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
             {/* Rental bar */}
             {eq && bar && (
               <div
-                className="absolute top-2 h-8 bg-red-100 border-2 border-red-800 rounded-md shadow-lg flex items-center px-3 z-20"
+                className="absolute top-2 h-5 bg-blue-50 border border-blue-200 rounded flex items-center px-2 text-[10px] font-medium text-blue-700 hover:brightness-95 transition-all cursor-pointer z-10"
                 style={{ left: `${bar.left}px`, width: `${bar.width}px` }}
               >
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-foreground truncate">
-                    {eq.code} - {eq.customer || 'No Customer'}
-                  </p>
-                  {eq.rentalRate > 0 && (
-                    <p className="text-[10px] text-black">${eq.rentalRate}/mo</p>
-                  )}
-                </div>
+                <span className="truncate">{eq.code}</span>
               </div>
             )}
           </div>
