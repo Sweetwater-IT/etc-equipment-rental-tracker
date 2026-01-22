@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { EquipmentData, RentalEntry } from '@/types/equipment';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -30,10 +30,21 @@ export default function EquipmentList({
   const [modalOpen, setModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pressedSwitch, setPressedSwitch] = useState<number | null>(null);
+  const [checkedStates, setCheckedStates] = useState<Record<number, boolean>>({});
+
+  // Initialize checked states from rentals
+  useEffect(() => {
+    const initial: Record<number, boolean> = {};
+    rentals.forEach(r => {
+      initial[r.equipment_id] = true;
+    });
+    setCheckedStates(initial);
+  }, [rentals]);
 
   const handleSwitchChange = (eq: EquipmentData, checked: boolean) => {
     if (checked) {
-      // Opening rental - animate switch then show modal
+      // Opening rental - update checked state immediately, animate switch then show modal
+      setCheckedStates(prev => ({ ...prev, [eq.id]: true }));
       setPressedSwitch(eq.id);
       setSelectedEquipment(eq);
       setTimeout(() => {
@@ -42,6 +53,7 @@ export default function EquipmentList({
       }, 200);
     } else {
       // Closing rental
+      setCheckedStates(prev => ({ ...prev, [eq.id]: false }));
       const updatedEquipment: EquipmentData = {
         ...eq,
         status: 'AVAILABLE',
@@ -113,7 +125,7 @@ export default function EquipmentList({
             </div>
           ) : (
             paginatedEquipment.map((eq) => {
-              const isOnRent = rentals.some(r => r.equipment_id === eq.id);
+              const isChecked = checkedStates[eq.id] || false;
               return (
                 <div
                   key={eq.id}
@@ -145,7 +157,7 @@ export default function EquipmentList({
                     >
                       <Switch
                         id={`switch-${eq.id}`}
-                        checked={isOnRent}
+                        checked={isChecked}
                         onCheckedChange={(checked) => handleSwitchChange(eq, checked)}
                       />
                     </div>
@@ -153,12 +165,12 @@ export default function EquipmentList({
                       htmlFor={`switch-${eq.id}`}
                       className="text-xs font-semibold cursor-pointer text-foreground flex-1"
                     >
-                      {isOnRent ? 'On Rent' : 'Available'}
+                      {isChecked ? 'On Rent' : 'Available'}
                     </Label>
                   </div>
 
                   {/* Customer and Rate */}
-                  {isOnRent && (
+                  {isChecked && (
                     <>
                       {eq.customer && (
                         <p className="text-xs text-foreground font-medium mb-1 truncate">
