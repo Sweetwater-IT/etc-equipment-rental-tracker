@@ -76,7 +76,7 @@ export default function TimelineHeader({ viewType, startDate }: TimelineHeaderPr
 
   return (
     <div className="border-b border-border bg-muted/50">
-      <div className="flex">{generateHeaders()}</div>
+      <div className="flex" style={{ minWidth: `${getDaysInView() * getCellWidth()}px` }}>{generateHeaders()}</div>
     </div>
   );
 }

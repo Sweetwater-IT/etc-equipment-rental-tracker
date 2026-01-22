@@ -98,7 +98,7 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
         return (
           <div id={`timeline-row-${rowIndex}`} key={eq?.id || `row-${rowIndex}`} className="relative h-12 border-b border-border hover:bg-muted/20">
             {/* Grid background */}
-            <div className="absolute inset-0 flex">{gridCells}</div>
+            <div className="absolute inset-0 flex" style={{ minWidth: `${daysInView * cellWidth}px` }}>{gridCells}</div>
 
             {/* Rental bar */}
             {eq && bar && (
