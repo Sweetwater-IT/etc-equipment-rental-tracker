@@ -53,7 +53,7 @@ export default function RentalModal({ open, equipment, onOpenChange, onSave }: R
     setBillingStartDate(undefined);
     setBillingEndDate(undefined);
     setCustomer(equipment?.customer || '');
-    setRentalAmount('');
+    setRentalAmount(equipment?.rentalRate ? equipment.rentalRate.toString() : '');
     setRentalFrequency('monthly');
   }, [equipment]);
 
@@ -385,9 +385,9 @@ export default function RentalModal({ open, equipment, onOpenChange, onSave }: R
               <span className="font-medium text-foreground">{equipment?.customer || 'Not assigned'}</span>
             </div>
             <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">Monthly Rate:</span>
+              <span className="text-muted-foreground">Rental Rate:</span>
               <span className="font-medium text-foreground">
-                ${equipment?.rentalRate ? equipment.rentalRate.toFixed(2) : '0.00'}
+                ${rentalAmount || '0.00'}/{rentalFrequency}
               </span>
             </div>
           </div>

@@ -93,7 +93,7 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
     <div className="flex-1">
       {Array.from({ length: minRows }, (_, rowIndex) => {
         const eq = allEquipment[rowIndex];
-        const bar = eq && eq.status === 'ON RENT' && eq.startDate && eq.endDate ? calculateBar(eq.startDate, eq.endDate) : null;
+        const bar = eq && eq.startDate && eq.endDate ? calculateBar(eq.startDate, eq.endDate) : null;
 
         return (
           <div id={`timeline-row-${rowIndex}`} key={eq?.id || `row-${rowIndex}`} className="relative h-12 border-b border-border hover:bg-muted/20">
