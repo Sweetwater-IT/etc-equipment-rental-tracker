@@ -79,11 +79,41 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const supabase = getSupabaseClient();
   const equipment = await request.json();
-  const dbData = transformToDB(equipment);
+
+  // If renting (status ON RENT), insert into equipment_entries
+  if (equipment.status === 'ON RENT') {
+    const entryData = {
+      equipment_id: equipment.id,
+      start_date: equipment.startDate,
+      end_date: equipment.endDate,
+      customer: equipment.customer,
+      rental_rate: equipment.rentalRate,
+      billing_start: equipment.billingStart,
+      billing_end: equipment.billingEnd,
+    };
+
+    const { error: entryError } = await supabase
+      .from('equipment_entries')
+      .insert(entryData);
+
+    if (entryError) {
+      return Response.json({ error: entryError.message }, { status: 500 });
+    }
+  }
+
+  // Update equipment with rental data
+  const updateData = {
+    status: equipment.status,
+    customer: equipment.customer,
+    rental_rate: equipment.rentalRate,
+    rental_start_date: equipment.startDate,
+    rental_end_date: equipment.endDate,
+    updated_at: new Date().toISOString(),
+  };
 
   const { data, error } = await supabase
     .from('equipment')
-    .update(dbData)
+    .update(updateData)
     .eq('id', equipment.id)
     .select()
     .single();
