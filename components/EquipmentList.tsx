@@ -31,6 +31,7 @@ export default function EquipmentList({
   const [currentPage, setCurrentPage] = useState(1);
   const [pressedSwitch, setPressedSwitch] = useState<number | null>(null);
   const [checkedStates, setCheckedStates] = useState<Record<number, boolean>>({});
+  const [saved, setSaved] = useState(false);
 
   // Initialize checked states from rentals
   useEffect(() => {
@@ -67,11 +68,21 @@ export default function EquipmentList({
   };
 
   const handleModalSave = (updatedEquipment: EquipmentData) => {
+    setSaved(true);
     const finalEquipment: EquipmentData = {
       ...updatedEquipment,
       status: 'ON RENT',
     };
     onEquipmentUpdate(finalEquipment);
+  };
+
+  const handleModalOpenChange = (open: boolean) => {
+    if (!open && !saved && selectedEquipment) {
+      // Cancelled, revert switch
+      setCheckedStates(prev => ({ ...prev, [selectedEquipment.id]: false }));
+    }
+    setSaved(false);
+    setModalOpen(open);
   };
 
   // Pagination logic
@@ -221,7 +232,7 @@ export default function EquipmentList({
       <RentalModal
         open={modalOpen}
         equipment={selectedEquipment}
-        onOpenChange={setModalOpen}
+        onOpenChange={handleModalOpenChange}
         onSave={handleModalSave}
       />
     </>
