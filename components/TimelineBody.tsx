@@ -36,7 +36,7 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
   }, [equipment]);
 
   // Calculate bar position
-  const calculateBar = (startStr: string, endStr: string) => {
+  const calculateBar = (startStr: string | Date, endStr: string | Date) => {
     const rentalStart = new Date(startStr);
     const rentalEnd = new Date(endStr);
 
@@ -102,7 +102,7 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
     <div className="flex-1 overflow-auto">
       {Array.from({ length: minRows }, (_, rowIndex) => {
         const eq = allEquipment[rowIndex];
-        const bar = eq && eq.status === 'ON RENT' && eq.startDate && eq.endDate ? calculateBar(eq.startDate, eq.endDate) : null;
+        const bar = eq && eq.status === 'ON RENT' && (eq as any).rental_start_date && (eq as any).rental_end_date ? calculateBar((eq as any).rental_start_date, (eq as any).rental_end_date) : null;
 
         return (
           <div key={eq?.id || `row-${rowIndex}`} className="relative h-12 border-b border-border hover:bg-muted/20">
@@ -117,10 +117,10 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-foreground truncate">
-                    {eq.code} - {eq.customer || 'No Customer'}
+                    {eq.code} - {(eq as any).customer || 'No Customer'}
                   </p>
-                  {eq.rentalRate > 0 && (
-                    <p className="text-[10px] text-black">${eq.rentalRate}/mo</p>
+                  {(eq as any).rental_rate > 0 && (
+                    <p className="text-[10px] text-black">${(eq as any).rental_rate}/mo</p>
                   )}
                 </div>
               </div>
