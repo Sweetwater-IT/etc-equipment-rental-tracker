@@ -19,7 +19,7 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [branchFilter, setBranchFilter] = useState<string>('all');
-  const [startDate, setStartDate] = useState(new Date(2025, 0, 1)); // January 2025
+  const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1)); // Current month 1st
   const [equipment, setEquipment] = useState<EquipmentData[]>([]);
   const [rentals, setRentals] = useState<RentalEntry[]>([]);
 
