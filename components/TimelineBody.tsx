@@ -117,7 +117,7 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
                   className="absolute top-2 h-5 bg-blue-50 border border-blue-200 rounded flex items-center px-2 text-[10px] font-medium text-blue-700 hover:brightness-95 transition-all cursor-pointer z-10"
                   style={{ left: `${bar.left}px`, width: `${bar.width}px` }}
                 >
-                  <span className="truncate">{rental.equipment_code} - {rental.equipment_category} - {rental.customer}</span>
+                  <span className="truncate">{rental.equipment_category.replace(/\b\w/g, l => l.toUpperCase())} - {rental.customer} - {rental.equipment_code}</span>
                 </div>
               );
             })}
