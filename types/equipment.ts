@@ -26,4 +26,5 @@ export interface RentalEntry {
   equipment_code: string;
   equipment_make: string;
   equipment_model: string;
+  equipment_category: string;
 }

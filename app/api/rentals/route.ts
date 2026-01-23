@@ -16,7 +16,8 @@ export async function GET() {
       equipment:equipment_id (
         code,
         make,
-        model
+        model,
+        category
       )
     `)
     .order('start_date');
@@ -41,6 +42,7 @@ export async function GET() {
     equipment_code: entry.equipment.code,
     equipment_make: entry.equipment.make,
     equipment_model: entry.equipment.model,
+    equipment_category: entry.equipment.category,
   }));
 
   return Response.json(rentals);
