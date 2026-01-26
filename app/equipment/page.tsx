@@ -25,9 +25,9 @@ export default function EquipmentPage() {
     if (action === 'Reserve') {
       setSelectedEquipment(eq);
       setReserveModalOpen(true);
-    } else if (action === 'Place on Rent') {
+    } else if (action === 'Rent') {
       // TODO: Open rental modal
-      console.log('Place on Rent:', eq);
+      console.log('Rent:', eq);
     } else if (action === 'Remove from Rent') {
       const updated = { ...eq, status: 'AVAILABLE' as const, startDate: '', endDate: '', customer: '', rentalRate: 0 };
       handleEquipmentUpdate(updated);

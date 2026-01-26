@@ -48,9 +48,9 @@ export default function EquipmentList({
   const getActions = (status: string) => {
     switch (status) {
       case 'AVAILABLE':
-        return ['Reserve', 'Place on Rent'];
+        return ['Reserve', 'Rent'];
       case 'RESERVE':
-        return ['Place on Rent', 'Remove from Reserve'];
+        return ['Rent', 'Remove from Reserve'];
       case 'ON RENT':
         return ['Remove from Rent'];
       case 'MAINTENANCE':
@@ -63,7 +63,7 @@ export default function EquipmentList({
   };
 
   const handleAction = (action: string, eq: EquipmentData) => {
-    if (action === 'Place on Rent') {
+    if (action === 'Rent') {
       setPressedSwitch(eq.id);
       setSelectedEquipment(eq);
       setTimeout(() => {
