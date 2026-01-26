@@ -3,7 +3,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import EquipmentList from '@/components/EquipmentList';
+import EquipmentTable from '@/components/EquipmentTable';
 import TimelineHeader from '@/components/TimelineHeader';
 import TimelineBody from '@/components/TimelineBody';
 import { fetchEquipment, updateEquipment, fetchRentals } from '@/lib/supabase-equipment';
@@ -71,6 +73,11 @@ export default function Home() {
       newDate.setFullYear(newDate.getFullYear() + 1);
     }
     setStartDate(newDate);
+  };
+
+  const handleTableAction = (action: string, equipment: EquipmentData) => {
+    console.log('Action:', action, 'Equipment:', equipment);
+    // TODO: Open modals based on action
   };
 
   return (
@@ -160,10 +167,19 @@ export default function Home() {
           onSearchChange={setSearchTerm}
           onEquipmentUpdate={handleEquipmentUpdate}
         />
-        <div className="flex-1 flex flex-col overflow-x-auto border-l border-border">
-          <TimelineHeader viewType={viewType} startDate={startDate} />
-          <TimelineBody equipment={filteredEquipment} viewType={viewType} startDate={startDate} />
-        </div>
+        <Tabs defaultValue="gantt" className="flex-1 flex flex-col">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="table">Equipment Table</TabsTrigger>
+            <TabsTrigger value="gantt">Gantt</TabsTrigger>
+          </TabsList>
+          <TabsContent value="table" className="flex-1 overflow-auto">
+            <EquipmentTable equipment={filteredEquipment} onAction={handleTableAction} />
+          </TabsContent>
+          <TabsContent value="gantt" className="flex-1 flex flex-col overflow-x-auto border-l border-border">
+            <TimelineHeader viewType={viewType} startDate={startDate} />
+            <TimelineBody equipment={filteredEquipment} viewType={viewType} startDate={startDate} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

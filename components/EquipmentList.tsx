@@ -3,10 +3,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import { EquipmentData, RentalEntry } from '@/types/equipment';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import RentalModal from './RentalModal';
+import ReserveModal from './ReserveModal';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface EquipmentListProps {
@@ -28,43 +29,59 @@ export default function EquipmentList({
 }: EquipmentListProps) {
   const [selectedEquipment, setSelectedEquipment] = useState<EquipmentData | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [reserveModalOpen, setReserveModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pressedSwitch, setPressedSwitch] = useState<number | null>(null);
-  const [checkedStates, setCheckedStates] = useState<Record<number, boolean>>({});
   const [saved, setSaved] = useState(false);
 
-  // Initialize checked states from rentals
-  useEffect(() => {
-    const initial: Record<number, boolean> = {};
-    rentals.forEach(r => {
-      initial[r.equipment_id] = true;
-    });
-    setCheckedStates(initial);
-  }, [rentals]);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'AVAILABLE': return 'bg-green-100 text-green-800';
+      case 'ON RENT': return 'bg-red-100 text-red-800';
+      case 'MAINTENANCE': return 'bg-yellow-100 text-yellow-800';
+      case 'DOS': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
-  const handleSwitchChange = (eq: EquipmentData, checked: boolean) => {
-    if (checked) {
-      // Opening rental - update checked state immediately, animate switch then show modal
-      setCheckedStates(prev => ({ ...prev, [eq.id]: true }));
+  const getActions = (status: string) => {
+    switch (status) {
+      case 'AVAILABLE':
+        return ['Reserve', 'Place on Rent'];
+      case 'ON RENT':
+        return ['Remove from Rent'];
+      case 'MAINTENANCE':
+        return ['Mark Available'];
+      case 'DOS':
+        return ['Mark Available'];
+      default:
+        return [];
+    }
+  };
+
+  const handleAction = (action: string, eq: EquipmentData) => {
+    if (action === 'Place on Rent') {
       setPressedSwitch(eq.id);
       setSelectedEquipment(eq);
       setTimeout(() => {
         setModalOpen(true);
         setPressedSwitch(null);
       }, 200);
-    } else {
-      // Closing rental
-      setCheckedStates(prev => ({ ...prev, [eq.id]: false }));
-      const updatedEquipment: EquipmentData = {
-        ...eq,
-        status: 'AVAILABLE',
-        startDate: '',
-        endDate: '',
-        customer: '',
-        rentalRate: 0,
-      };
-      onEquipmentUpdate(updatedEquipment);
+    } else if (action === 'Remove from Rent') {
+      const updated = { ...eq, status: 'AVAILABLE' as const, startDate: '', endDate: '', customer: '', rentalRate: 0 };
+      onEquipmentUpdate(updated);
+    } else if (action === 'Reserve') {
+      setSelectedEquipment(eq);
+      setReserveModalOpen(true);
+    } else if (action === 'Mark Available') {
+      const updated = { ...eq, status: 'AVAILABLE' as const };
+      onEquipmentUpdate(updated);
     }
+  };
+
+  const handleReserveSave = (reservation: any) => {
+    console.log('Save reservation', reservation);
+    // TODO: POST to /api/reservations
   };
 
   const handleModalSave = (updatedEquipment: EquipmentData) => {
@@ -77,10 +94,6 @@ export default function EquipmentList({
   };
 
   const handleModalOpenChange = (open: boolean) => {
-    if (!open && !saved && selectedEquipment) {
-      // Cancelled, revert switch
-      setCheckedStates(prev => ({ ...prev, [selectedEquipment.id]: false }));
-    }
     setSaved(false);
     setModalOpen(open);
   };
@@ -136,7 +149,6 @@ export default function EquipmentList({
             </div>
           ) : (
             paginatedEquipment.map((eq) => {
-              const isChecked = checkedStates[eq.id] || false;
               return (
                 <div
                   key={eq.id}
@@ -159,29 +171,27 @@ export default function EquipmentList({
                     </div>
                   </div>
 
-                  {/* On Rent Switch */}
+                  {/* Status and Actions */}
                   <div className="flex items-center gap-2 bg-muted/40 rounded px-2 py-2 mb-2">
-                    <div
-                      className={`transition-all duration-150 ease-out ${
-                        pressedSwitch === eq.id ? 'scale-95 shadow-sm' : 'scale-100'
-                      }`}
-                    >
-                      <Switch
-                        id={`switch-${eq.id}`}
-                        checked={isChecked}
-                        onCheckedChange={(checked) => handleSwitchChange(eq, checked)}
-                      />
-                    </div>
-                    <Label
-                      htmlFor={`switch-${eq.id}`}
-                      className="text-xs font-semibold cursor-pointer text-foreground flex-1"
-                    >
-                      {isChecked ? 'On Rent' : 'Available'}
-                    </Label>
+                    <Badge className={getStatusColor(eq.status)}>{eq.status}</Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className={`h-6 px-2 transition-all duration-150 ease-out ${pressedSwitch === eq.id ? 'scale-95 shadow-sm' : 'scale-100'}`}>
+                          Action
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {getActions(eq.status).map(action => (
+                          <DropdownMenuItem key={action} onClick={() => handleAction(action, eq)}>
+                            {action}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
 
                   {/* Customer and Rate */}
-                  {isChecked && (
+                  {eq.status === 'ON RENT' && (
                     <>
                       {eq.customer && (
                         <p className="text-xs text-foreground font-medium mb-1 truncate">
@@ -234,6 +244,13 @@ export default function EquipmentList({
         equipment={selectedEquipment}
         onOpenChange={handleModalOpenChange}
         onSave={handleModalSave}
+      />
+
+      <ReserveModal
+        open={reserveModalOpen}
+        equipment={selectedEquipment}
+        onOpenChange={setReserveModalOpen}
+        onSave={handleReserveSave}
       />
     </>
   );
