@@ -79,7 +79,7 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
       </div>
 
       <Table className="table-fixed">
-        <TableHeader>
+        <TableHeader className="bg-muted">
           <TableRow>
             <TableHead className="w-[120px]">Category</TableHead>
             <TableHead className="w-[100px]">Code</TableHead>
@@ -93,17 +93,17 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
         <TableBody>
           {paginatedEquipment.map((eq) => (
             <TableRow key={eq.id}>
-              <TableCell className="font-medium border-r">{(eq as any).category || eq.type || ''}</TableCell>
-              <TableCell className="border-r">{(eq as any).code || eq.code || ''}</TableCell>
-              <TableCell className="border-r">{(eq as any).make || eq.make || ''}</TableCell>
-              <TableCell className="border-r">{(eq as any).model || eq.model || ''}</TableCell>
-              <TableCell className="border-r">{(eq as any).etc_location || eq.branch || ''}</TableCell>
-              <TableCell className="border-r">
+              <TableCell className="font-medium border-r py-3">{(eq as any).category || eq.type || ''}</TableCell>
+              <TableCell className="border-r py-3">{(eq as any).code || eq.code || ''}</TableCell>
+              <TableCell className="border-r py-3">{(eq as any).make || eq.make || ''}</TableCell>
+              <TableCell className="border-r py-3">{(eq as any).model || eq.model || ''}</TableCell>
+              <TableCell className="border-r py-3">{(eq as any).etc_location || eq.branch || ''}</TableCell>
+              <TableCell className="border-r py-3">
                 <Badge className={getStatusColor(eq.status)}>
                   {eq.status}
                 </Badge>
               </TableCell>
-              <TableCell>
+              <TableCell className="py-3">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
