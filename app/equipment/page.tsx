@@ -12,7 +12,10 @@ export default function EquipmentPage() {
   const [equipment, setEquipment] = useState<EquipmentData[]>([]);
 
   useEffect(() => {
-    fetchEquipment().then(setEquipment);
+    fetchEquipment().then((data) => {
+      console.log('Equipment data:', data);
+      setEquipment(data);
+    });
   }, []);
 
   const handleTableAction = (action: string, equipment: EquipmentData) => {

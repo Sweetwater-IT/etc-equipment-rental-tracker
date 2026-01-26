@@ -21,11 +21,11 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
 
   const filteredEquipment = useMemo(() => {
     return equipment.filter((eq) =>
-      eq.code.toLowerCase().includes(search.toLowerCase()) ||
-      eq.type.toLowerCase().includes(search.toLowerCase()) ||
-      eq.make.toLowerCase().includes(search.toLowerCase()) ||
-      eq.model.toLowerCase().includes(search.toLowerCase()) ||
-      eq.branch.toLowerCase().includes(search.toLowerCase())
+      (eq.code || '').toLowerCase().includes(search.toLowerCase()) ||
+      (eq.type || '').toLowerCase().includes(search.toLowerCase()) ||
+      (eq.make || '').toLowerCase().includes(search.toLowerCase()) ||
+      (eq.model || '').toLowerCase().includes(search.toLowerCase()) ||
+      (eq.branch || '').toLowerCase().includes(search.toLowerCase())
     );
   }, [equipment, search]);
 
@@ -93,11 +93,11 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
         <TableBody>
           {paginatedEquipment.map((eq) => (
             <TableRow key={eq.id}>
-              <TableCell className="font-medium">{eq.type}</TableCell>
-              <TableCell>{eq.code}</TableCell>
-              <TableCell>{eq.make}</TableCell>
-              <TableCell>{eq.model}</TableCell>
-              <TableCell>{eq.branch}</TableCell>
+              <TableCell className="font-medium">{eq.type || ''}</TableCell>
+              <TableCell>{eq.code || ''}</TableCell>
+              <TableCell>{eq.make || ''}</TableCell>
+              <TableCell>{eq.model || ''}</TableCell>
+              <TableCell>{eq.branch || ''}</TableCell>
               <TableCell>
                 <Badge className={getStatusColor(eq.status)}>
                   {eq.status}
