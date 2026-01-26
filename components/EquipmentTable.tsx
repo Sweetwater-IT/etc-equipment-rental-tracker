@@ -93,17 +93,17 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
         <TableBody>
           {paginatedEquipment.map((eq) => (
             <TableRow key={eq.id}>
-              <TableCell className="font-medium border-r py-3">{(eq as any).category || eq.type || ''}</TableCell>
-              <TableCell className="border-r py-3">{(eq as any).code || eq.code || ''}</TableCell>
-              <TableCell className="border-r py-3">{(eq as any).make || eq.make || ''}</TableCell>
-              <TableCell className="border-r py-3">{(eq as any).model || eq.model || ''}</TableCell>
-              <TableCell className="border-r py-3">{(eq as any).etc_location || eq.branch || ''}</TableCell>
-              <TableCell className="border-r py-3">
+              <TableCell className="font-medium border-r py-2">{(eq as any).category || eq.type || ''}</TableCell>
+              <TableCell className="border-r py-2">{(eq as any).code || eq.code || ''}</TableCell>
+              <TableCell className="border-r py-2">{(eq as any).make || eq.make || ''}</TableCell>
+              <TableCell className="border-r py-2">{(eq as any).model || eq.model || ''}</TableCell>
+              <TableCell className="border-r py-2">{(eq as any).etc_location || eq.branch || ''}</TableCell>
+              <TableCell className="border-r py-2">
                 <Badge className={getStatusColor(eq.status)}>
                   {eq.status}
                 </Badge>
               </TableCell>
-              <TableCell className="py-3">
+              <TableCell className="py-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
