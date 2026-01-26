@@ -4,12 +4,15 @@ import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import EquipmentTable from '@/components/EquipmentTable';
-import { fetchEquipment } from '@/lib/supabase-equipment';
+import ReserveModal from '@/components/ReserveModal';
+import { fetchEquipment, updateEquipment } from '@/lib/supabase-equipment';
 import { EquipmentData } from '@/types/equipment';
 import Link from 'next/link';
 
 export default function EquipmentPage() {
   const [equipment, setEquipment] = useState<EquipmentData[]>([]);
+  const [selectedEquipment, setSelectedEquipment] = useState<EquipmentData | null>(null);
+  const [reserveModalOpen, setReserveModalOpen] = useState(false);
 
   useEffect(() => {
     fetchEquipment().then((data) => {
@@ -18,9 +21,44 @@ export default function EquipmentPage() {
     });
   }, []);
 
-  const handleTableAction = (action: string, equipment: EquipmentData) => {
-    console.log('Action:', action, 'Equipment:', equipment);
-    // TODO: Open modals based on action
+  const handleTableAction = (action: string, eq: EquipmentData) => {
+    if (action === 'Reserve') {
+      setSelectedEquipment(eq);
+      setReserveModalOpen(true);
+    } else if (action === 'Place on Rent') {
+      // TODO: Open rental modal
+      console.log('Place on Rent:', eq);
+    } else if (action === 'Remove from Rent') {
+      const updated = { ...eq, status: 'AVAILABLE' as const, startDate: '', endDate: '', customer: '', rentalRate: 0 };
+      handleEquipmentUpdate(updated);
+    } else if (action === 'Remove from Reserve') {
+      const updated = { ...eq, status: 'AVAILABLE' as const };
+      handleEquipmentUpdate(updated);
+    } else if (action === 'Mark Available') {
+      const updated = { ...eq, status: 'AVAILABLE' as const };
+      handleEquipmentUpdate(updated);
+    }
+  };
+
+  const handleEquipmentUpdate = async (updatedEquipment: EquipmentData) => {
+    const result = await updateEquipment(updatedEquipment);
+    if (result) {
+      setEquipment((prev) => prev.map((eq) => (eq.id === result.id ? result : eq)));
+    }
+  };
+
+  const handleReserveSave = (reservation: any) => {
+    if (selectedEquipment) {
+      const updated = {
+        ...selectedEquipment,
+        status: 'RESERVE' as const,
+        startDate: reservation.start_date,
+        endDate: reservation.end_date,
+        customer: reservation.customer,
+        rentalRate: reservation.rental_rate,
+      };
+      handleEquipmentUpdate(updated);
+    }
   };
 
   return (
@@ -53,6 +91,13 @@ export default function EquipmentPage() {
       <div className="flex-1 overflow-auto">
         <EquipmentTable equipment={equipment} onAction={handleTableAction} />
       </div>
+
+      <ReserveModal
+        open={reserveModalOpen}
+        equipment={selectedEquipment}
+        onOpenChange={setReserveModalOpen}
+        onSave={handleReserveSave}
+      />
     </div>
   );
 }

@@ -37,8 +37,9 @@ export default function EquipmentList({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'AVAILABLE': return 'bg-green-100 text-green-800';
+      case 'RESERVE': return 'bg-yellow-100 text-yellow-800';
       case 'ON RENT': return 'bg-red-100 text-red-800';
-      case 'MAINTENANCE': return 'bg-yellow-100 text-yellow-800';
+      case 'MAINTENANCE': return 'bg-orange-100 text-orange-800';
       case 'DOS': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -48,6 +49,8 @@ export default function EquipmentList({
     switch (status) {
       case 'AVAILABLE':
         return ['Reserve', 'Place on Rent'];
+      case 'RESERVE':
+        return ['Place on Rent', 'Remove from Reserve'];
       case 'ON RENT':
         return ['Remove from Rent'];
       case 'MAINTENANCE':
@@ -73,6 +76,9 @@ export default function EquipmentList({
     } else if (action === 'Reserve') {
       setSelectedEquipment(eq);
       setReserveModalOpen(true);
+    } else if (action === 'Remove from Reserve') {
+      const updated = { ...eq, status: 'AVAILABLE' as const };
+      onEquipmentUpdate(updated);
     } else if (action === 'Mark Available') {
       const updated = { ...eq, status: 'AVAILABLE' as const };
       onEquipmentUpdate(updated);
@@ -80,8 +86,17 @@ export default function EquipmentList({
   };
 
   const handleReserveSave = (reservation: any) => {
-    console.log('Save reservation', reservation);
-    // TODO: POST to /api/reservations
+    if (selectedEquipment) {
+      const updated = {
+        ...selectedEquipment,
+        status: 'RESERVE' as const,
+        startDate: reservation.start_date,
+        endDate: reservation.end_date,
+        customer: reservation.customer,
+        rentalRate: reservation.rental_rate,
+      };
+      onEquipmentUpdate(updated);
+    }
   };
 
   const handleModalSave = (updatedEquipment: EquipmentData) => {
@@ -174,20 +189,19 @@ export default function EquipmentList({
                   {/* Status and Actions */}
                   <div className="flex items-center gap-2 bg-muted/40 rounded px-2 py-2 mb-2">
                     <Badge className={getStatusColor(eq.status)}>{eq.status}</Badge>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className={`h-6 px-2 transition-all duration-150 ease-out ${pressedSwitch === eq.id ? 'scale-95 shadow-sm' : 'scale-100'}`}>
-                          Action
+                    <div className="flex gap-1">
+                      {getActions(eq.status).map(action => (
+                        <Button
+                          key={action}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleAction(action, eq)}
+                          className={`h-6 px-2 transition-all duration-150 ease-out text-xs ${pressedSwitch === eq.id ? 'scale-95 shadow-sm' : 'scale-100'}`}
+                        >
+                          {action}
                         </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        {getActions(eq.status).map(action => (
-                          <DropdownMenuItem key={action} onClick={() => handleAction(action, eq)}>
-                            {action}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Customer and Rate */}

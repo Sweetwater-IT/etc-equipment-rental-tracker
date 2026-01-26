@@ -43,8 +43,9 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'AVAILABLE': return 'bg-green-100 text-green-800';
+      case 'RESERVE': return 'bg-yellow-100 text-yellow-800';
       case 'ON RENT': return 'bg-red-100 text-red-800';
-      case 'MAINTENANCE': return 'bg-yellow-100 text-yellow-800';
+      case 'MAINTENANCE': return 'bg-orange-100 text-orange-800';
       case 'DOS': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -54,6 +55,8 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
     switch (status) {
       case 'AVAILABLE':
         return ['Reserve', 'Place on Rent'];
+      case 'RESERVE':
+        return ['Place on Rent', 'Remove from Reserve'];
       case 'ON RENT':
         return ['Remove from Rent'];
       case 'MAINTENANCE':
@@ -108,23 +111,19 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
                 </Badge>
               </TableCell>
               <TableCell className="py-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
+                <div className="flex gap-1">
+                  {getActions(eq.status).map((action) => (
+                    <Button
+                      key={action}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onAction(action, eq)}
+                      className="h-7 text-xs px-2"
+                    >
+                      {action}
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {getActions(eq.status).map((action) => (
-                      <DropdownMenuItem
-                        key={action}
-                        onClick={() => onAction(action, eq)}
-                      >
-                        {action}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  ))}
+                </div>
               </TableCell>
             </TableRow>
           ))}
