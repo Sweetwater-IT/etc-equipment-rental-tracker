@@ -112,17 +112,30 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
               </TableCell>
               <TableCell className="py-2">
                 <div className="flex gap-1">
-                  {getActions(eq.status).map((action) => (
-                    <Button
-                      key={action}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onAction(action, eq)}
-                      className="h-7 text-xs px-2"
-                    >
-                      {action}
-                    </Button>
-                  ))}
+                  {getActions(eq.status).map((action) => {
+                    const getButtonClasses = (action: string) => {
+                      const base = 'h-7 text-xs px-2';
+                      switch (action) {
+                        case 'Reserve': return `${base} bg-yellow-100 border-yellow-800 text-yellow-800 hover:bg-yellow-200`;
+                        case 'Rent': return `${base} bg-blue-100 border-blue-800 text-blue-800 hover:bg-blue-200`;
+                        case 'Remove from Rent': return `${base} bg-red-100 border-red-800 text-red-800 hover:bg-red-200`;
+                        case 'Remove from Reserve': return `${base} bg-gray-100 border-gray-800 text-gray-800 hover:bg-gray-200`;
+                        case 'Mark Available': return `${base} bg-gray-100 border-gray-800 text-gray-800 hover:bg-gray-200`;
+                        default: return base;
+                      }
+                    };
+                    return (
+                      <Button
+                        key={action}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onAction(action, eq)}
+                        className={getButtonClasses(action)}
+                      >
+                        {action}
+                      </Button>
+                    );
+                  })}
                 </div>
               </TableCell>
             </TableRow>

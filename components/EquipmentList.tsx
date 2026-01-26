@@ -190,17 +190,30 @@ export default function EquipmentList({
                   <div className="flex items-center gap-2 bg-muted/40 rounded px-2 py-2 mb-2">
                     <Badge className={getStatusColor(eq.status)}>{eq.status}</Badge>
                     <div className="flex gap-1">
-                      {getActions(eq.status).map(action => (
-                        <Button
-                          key={action}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleAction(action, eq)}
-                          className={`h-6 px-2 transition-all duration-150 ease-out text-xs ${pressedSwitch === eq.id ? 'scale-95 shadow-sm' : 'scale-100'}`}
-                        >
-                          {action}
-                        </Button>
-                      ))}
+                      {getActions(eq.status).map(action => {
+                        const getButtonClasses = (action: string) => {
+                          const base = `h-6 px-2 transition-all duration-150 ease-out text-xs ${pressedSwitch === eq.id ? 'scale-95 shadow-sm' : 'scale-100'}`;
+                          switch (action) {
+                            case 'Reserve': return `${base} bg-yellow-100 border-yellow-800 text-yellow-800 hover:bg-yellow-200`;
+                            case 'Rent': return `${base} bg-blue-100 border-blue-800 text-blue-800 hover:bg-blue-200`;
+                            case 'Remove from Rent': return `${base} bg-red-100 border-red-800 text-red-800 hover:bg-red-200`;
+                            case 'Remove from Reserve': return `${base} bg-gray-100 border-gray-800 text-gray-800 hover:bg-gray-200`;
+                            case 'Mark Available': return `${base} bg-gray-100 border-gray-800 text-gray-800 hover:bg-gray-200`;
+                            default: return base;
+                          }
+                        };
+                        return (
+                          <Button
+                            key={action}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleAction(action, eq)}
+                            className={getButtonClasses(action)}
+                          >
+                            {action}
+                          </Button>
+                        );
+                      })}
                     </div>
                   </div>
 
