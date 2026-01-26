@@ -17,15 +17,15 @@ interface EquipmentTableProps {
 export default function EquipmentTable({ equipment, onAction }: EquipmentTableProps) {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 25;
 
   const filteredEquipment = useMemo(() => {
     return equipment.filter((eq) =>
-      (eq.code || '').toLowerCase().includes(search.toLowerCase()) ||
-      (eq.type || '').toLowerCase().includes(search.toLowerCase()) ||
-      (eq.make || '').toLowerCase().includes(search.toLowerCase()) ||
-      (eq.model || '').toLowerCase().includes(search.toLowerCase()) ||
-      (eq.branch || '').toLowerCase().includes(search.toLowerCase())
+      ((eq as any).code || '').toLowerCase().includes(search.toLowerCase()) ||
+      ((eq as any).category || '').toLowerCase().includes(search.toLowerCase()) ||
+      ((eq as any).make || '').toLowerCase().includes(search.toLowerCase()) ||
+      ((eq as any).model || '').toLowerCase().includes(search.toLowerCase()) ||
+      ((eq as any).etc_location || '').toLowerCase().includes(search.toLowerCase())
     );
   }, [equipment, search]);
 
@@ -78,27 +78,27 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
         </div>
       </div>
 
-      <Table>
+      <Table className="table-fixed">
         <TableHeader>
           <TableRow>
-            <TableHead>Category</TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead>Make</TableHead>
-            <TableHead>Model</TableHead>
-            <TableHead>Branch</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="w-[120px]">Category</TableHead>
+            <TableHead className="w-[100px]">Code</TableHead>
+            <TableHead className="w-[100px]">Make</TableHead>
+            <TableHead className="w-[100px]">Model</TableHead>
+            <TableHead className="w-[120px]">Branch</TableHead>
+            <TableHead className="w-[100px]">Status</TableHead>
+            <TableHead className="w-[80px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {paginatedEquipment.map((eq) => (
             <TableRow key={eq.id}>
-              <TableCell className="font-medium">{eq.type || ''}</TableCell>
-              <TableCell>{eq.code || ''}</TableCell>
-              <TableCell>{eq.make || ''}</TableCell>
-              <TableCell>{eq.model || ''}</TableCell>
-              <TableCell>{eq.branch || ''}</TableCell>
-              <TableCell>
+              <TableCell className="font-medium border-r">{(eq as any).category || eq.type || ''}</TableCell>
+              <TableCell className="border-r">{(eq as any).code || eq.code || ''}</TableCell>
+              <TableCell className="border-r">{(eq as any).make || eq.make || ''}</TableCell>
+              <TableCell className="border-r">{(eq as any).model || eq.model || ''}</TableCell>
+              <TableCell className="border-r">{(eq as any).etc_location || eq.branch || ''}</TableCell>
+              <TableCell className="border-r">
                 <Badge className={getStatusColor(eq.status)}>
                   {eq.status}
                 </Badge>
