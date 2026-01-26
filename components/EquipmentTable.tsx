@@ -3,9 +3,11 @@
 import { EquipmentData } from '@/types/equipment';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
+import { useState, useMemo } from 'react';
 
 interface EquipmentTableProps {
   equipment: EquipmentData[];
@@ -13,6 +15,27 @@ interface EquipmentTableProps {
 }
 
 export default function EquipmentTable({ equipment, onAction }: EquipmentTableProps) {
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  const filteredEquipment = useMemo(() => {
+    return equipment.filter((eq) =>
+      eq.code.toLowerCase().includes(search.toLowerCase()) ||
+      eq.type.toLowerCase().includes(search.toLowerCase()) ||
+      eq.make.toLowerCase().includes(search.toLowerCase()) ||
+      eq.model.toLowerCase().includes(search.toLowerCase()) ||
+      eq.branch.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [equipment, search]);
+
+  const paginatedEquipment = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredEquipment.slice(start, start + pageSize);
+  }, [filteredEquipment, page, pageSize]);
+
+  const totalPages = Math.ceil(filteredEquipment.length / pageSize);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'AVAILABLE': return 'bg-green-100 text-green-800';
@@ -39,22 +62,41 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
   };
 
   return (
-    <div className="p-4">
+    <div className="p-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <Input
+          placeholder="Search equipment (code, type, make, model, branch)..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          className="max-w-md h-9"
+        />
+        <div className="text-sm text-muted-foreground">
+          {filteredEquipment.length} of {equipment.length} equipment
+        </div>
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Type</TableHead>
+            <TableHead>Category</TableHead>
             <TableHead>Code</TableHead>
+            <TableHead>Make</TableHead>
+            <TableHead>Model</TableHead>
             <TableHead>Branch</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {equipment.map((eq) => (
+          {paginatedEquipment.map((eq) => (
             <TableRow key={eq.id}>
-              <TableCell>{eq.type}</TableCell>
+              <TableCell className="font-medium">{eq.type}</TableCell>
               <TableCell>{eq.code}</TableCell>
+              <TableCell>{eq.make}</TableCell>
+              <TableCell>{eq.model}</TableCell>
               <TableCell>{eq.branch}</TableCell>
               <TableCell>
                 <Badge className={getStatusColor(eq.status)}>
@@ -84,6 +126,32 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
           ))}
         </TableBody>
       </Table>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Page {page} of {totalPages}
+          </div>
+          <div className="flex gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
