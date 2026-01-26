@@ -108,29 +108,33 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
             {/* Grid background */}
             <div className="absolute inset-0 flex" style={{ minWidth: `${daysInView * cellWidth}px` }}>{gridCells}</div>
 
-            {/* Status bars */}
-            {eq && (eq.status === 'RESERVE' || eq.status === 'ON RENT') && eq.startDate && eq.endDate && (
+            {/* Rental bars for ON RENT */}
+            {eqRentals.map((rental) => {
+              const bar = calculateBar(rental.start_date, rental.end_date);
+              if (!bar) return null;
+              return (
+                <div
+                  key={rental.id}
+                  className="absolute top-2 h-5 bg-blue-50 border border-blue-200 rounded flex items-center px-2 text-[10px] font-medium text-blue-700 hover:brightness-95 transition-all cursor-pointer z-10"
+                  style={{ left: `${bar.left}px`, width: `${bar.width}px` }}
+                >
+                  <span className="truncate">{rental.equipment_category.replace(/\b\w/g, l => l.toUpperCase())} - {rental.customer} - {rental.equipment_code}</span>
+                </div>
+              );
+            })}
+
+            {/* Status bars for RESERVE */}
+            {eq && eq.status === 'RESERVE' && eq.startDate && eq.endDate && (
               (() => {
-                console.log('Showing bar for eq:', eq.id, eq.status, eq.startDate, eq.endDate);
                 const bar = calculateBar(eq.startDate, eq.endDate);
-                if (!bar) {
-                  console.log('No bar calculated for eq:', eq.id);
-                  return null;
-                }
-                const isReserve = eq.status === 'RESERVE';
+                if (!bar) return null;
                 return (
                   <div
-                    key={`status-${eq.id}`}
-                    className={`absolute top-2 h-5 rounded flex items-center px-2 text-[10px] font-medium hover:brightness-95 transition-all cursor-pointer z-10 ${
-                      isReserve
-                        ? 'bg-yellow-50 border border-yellow-200 text-yellow-700'
-                        : 'bg-red-50 border border-red-200 text-red-700'
-                    }`}
+                    key={`reserve-${eq.id}`}
+                    className="absolute top-2 h-5 bg-yellow-50 border border-yellow-200 rounded flex items-center px-2 text-[10px] font-medium text-yellow-700 hover:brightness-95 transition-all cursor-pointer z-10"
                     style={{ left: `${bar.left}px`, width: `${bar.width}px` }}
                   >
-                    <span className="truncate">
-                      {isReserve ? 'Reserved' : 'Rented'} - {eq.customer || 'No Customer'} - {eq.code}
-                    </span>
+                    <span className="truncate">Reserved - {eq.customer || 'No Customer'} - {eq.code}</span>
                   </div>
                 );
               })()
