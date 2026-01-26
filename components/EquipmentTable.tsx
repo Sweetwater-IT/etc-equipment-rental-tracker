@@ -19,6 +19,10 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
   const [page, setPage] = useState(1);
   const pageSize = 25;
 
+  const capitalizeWords = (str: string) => {
+    return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+  };
+
   const filteredEquipment = useMemo(() => {
     return equipment.filter((eq) =>
       ((eq as any).code || '').toLowerCase().includes(search.toLowerCase()) ||
@@ -93,7 +97,7 @@ export default function EquipmentTable({ equipment, onAction }: EquipmentTablePr
         <TableBody>
           {paginatedEquipment.map((eq) => (
             <TableRow key={eq.id}>
-              <TableCell className="font-medium border-r py-2">{(eq as any).category || eq.type || ''}</TableCell>
+              <TableCell className="font-medium border-r py-2">{capitalizeWords((eq as any).category || eq.type || '')}</TableCell>
               <TableCell className="border-r py-2">{(eq as any).code || eq.code || ''}</TableCell>
               <TableCell className="border-r py-2">{(eq as any).make || eq.make || ''}</TableCell>
               <TableCell className="border-r py-2">{(eq as any).model || eq.model || ''}</TableCell>
