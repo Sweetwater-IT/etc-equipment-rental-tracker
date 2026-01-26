@@ -39,6 +39,7 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
 
   // All equipment, sorted by code
   const allEquipment = useMemo(() => {
+    console.log('All equipment in TimelineBody:', equipment);
     return [...equipment].sort((a, b) => a.code.localeCompare(b.code));
   }, [equipment]);
 
@@ -110,8 +111,12 @@ export default function TimelineBody({ equipment, viewType, startDate }: Timelin
             {/* Status bars */}
             {eq && (eq.status === 'RESERVE' || eq.status === 'ON RENT') && eq.startDate && eq.endDate && (
               (() => {
+                console.log('Showing bar for eq:', eq.id, eq.status, eq.startDate, eq.endDate);
                 const bar = calculateBar(eq.startDate, eq.endDate);
-                if (!bar) return null;
+                if (!bar) {
+                  console.log('No bar calculated for eq:', eq.id);
+                  return null;
+                }
                 const isReserve = eq.status === 'RESERVE';
                 return (
                   <div
